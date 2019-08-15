@@ -1,0 +1,28 @@
+{
+  "name": "@mpfe/mpa",
+  "description": "",
+  "version": "0.1.0",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "scripts": {
+    "build": "yarn run build-cjs",
+    "build-cjs": "rimraf ./lib && tsc",
+    "watch": "rimraf ./lib && tsc --watch",
+    "link": "npm link"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "redux": "^4.0.4",
+    "redux-logger": "^3.0.6",
+    "redux-saga": "^1.0.5",
+    "rimraf": "^2.6.3",
+    "warning": "^4.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^12.6.8"
+  }
+}
