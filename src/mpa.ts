@@ -25,12 +25,14 @@ const mpaInitModel: Model = {
 
 export default ({
   appReducer = {},
-  middlewares = []
+  middlewares = [],
+  silence = false
 }: {
   appReducer?: {
     [key: string]: Reducer;
   };
   middlewares?: Array<any>;
+  silence?: boolean
 } = {}): App => {
   let _store: Store;
   let _hasRun = false;
@@ -79,7 +81,9 @@ export default ({
     // 1.
     const store = create({
       appReducer: { ...createReducers(), ...appReducer },
-      middlewares: [...middlewares, sagaMiddleware]
+      middlewares: [...middlewares, sagaMiddleware],
+      silence
+
     });
 
     store.subscribe(() => {
@@ -114,7 +118,7 @@ export default ({
       }
       _actions[namespace] = {
         ..._actions[namespace],
-        [b]: actionCreator(`${model.namespace}/${b}`)
+        [b]: actionWrapper(`${model.namespace}/${b}`)
       };
       a[`${namespace}/${b}`] = reducer[b];
       return a;
@@ -128,18 +132,26 @@ export default ({
     };
   }
 
-  function actionCreator(type: string) {
-    return (
-      payload: any,
+  function actionWrapper(type: string) {
+    function actionCreator(payload: any,
       meta: any = null,
-      error: any = null
-    ): { type: string; [key: string]: any } => ({
-      type: type,
-      payload,
-      meta,
-      error
-    });
+      error: any = null): { type: string;[key: string]: any } {
+      return {
+        type: type,
+        payload,
+        meta,
+        error
+      }
+    }
+    //重写toString
+    actionCreator._toString = actionCreator.toString;
+
+    actionCreator.toString = () => {
+      return type;
+    }
+    return actionCreator
   }
+
 
   function createEffects() {
     for (const model of app._models) {
@@ -147,23 +159,30 @@ export default ({
         _effect.push(model.effect(app.actions(model.namespace), app.actions()));
       }
     }
-    return function* rootSaga() {
-      try {
-        yield all(_effect.map(fork));
-      } catch (error) {
-        console.error(error);
+
+    function errorWrapper(saga) {
+      return function* () {
+        try {
+          yield fork(saga)
+        } catch (error) {
+          console.log(error)
+        }
       }
+    }
+    return function* rootSaga() {
+      yield all(_effect.map(errorWrapper).map(fork));
     };
   }
 
   function create({
     middlewares = [],
-    appReducer
+    appReducer, silence
   }: {
     middlewares: Array<any>;
     appReducer: any;
+    silence: boolean
   }): Store {
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === "development" && !silence) {
       middlewares.push(logger);
     }
     const store = createStore(
