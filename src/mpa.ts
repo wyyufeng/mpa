@@ -185,10 +185,7 @@ export default ({
     if (process.env.NODE_ENV === "development" && !silence) {
       middlewares.push(logger);
     }
-    // const store = createStore(
-    //   combineReducers(appReducer),
-    //   composeEnhancers(applyMiddleware(...middlewares))
-    // );
+
 
     return createStore(
       combineReducers(appReducer),
