@@ -14,6 +14,9 @@ export declare type Reducer<S = any, A = Action> = (state: S | undefined, action
 export interface ReducerMap {
     [actionType: string]: Reducer;
 }
+export interface UseModal {
+    (...models: Array<Model>): any;
+}
 export interface Model {
     namespace: string;
     state: any;
@@ -24,7 +27,7 @@ export interface App {
     store: Store;
     actions: Function;
     _models: Array<Model>;
-    useModel: (model: Model) => App;
+    useModel: UseModal;
     run: () => App;
     useListener: (state: any) => number;
     unuseListener: (index: number) => void;
