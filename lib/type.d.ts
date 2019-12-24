@@ -2,9 +2,9 @@ import { Saga } from "redux-saga";
 import { Store } from "redux";
 export interface Action {
     type: string;
-    payload?: any;
-    meta?: any;
-    error?: any;
+    payload: Object;
+    meta: Object;
+    error: any;
 }
 export declare type ActionCreatore = (...args: any[]) => Action;
 export interface Actions {
