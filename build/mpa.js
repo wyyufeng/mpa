@@ -1,4 +1,3 @@
-"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -44,26 +43,25 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
             r[k] = a[j];
     return r;
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-var redux_saga_1 = require("redux-saga");
-var effects_1 = require("redux-saga/effects");
-var redux_1 = require("redux");
-var redux_logger_1 = require("redux-logger");
+import createSagaMiddleware from "redux-saga";
+import { fork, all } from "redux-saga/effects";
+import { combineReducers, applyMiddleware, compose, createStore } from "redux";
+import { logger } from "redux-logger";
 var warning = require("warning");
-var composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || redux_1.compose;
+var composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 var mpaInitModel = {
     namespace: "@@mpa",
     state: "@@mpa/state",
     reducer: {}
 };
-exports.default = (function (_a) {
+export default (function (_a) {
     var _b = _a === void 0 ? {} : _a, _c = _b.appReducer, appReducer = _c === void 0 ? {} : _c, _d = _b.middlewares, middlewares = _d === void 0 ? [] : _d, _e = _b.silence, silence = _e === void 0 ? false : _e;
     var _store;
     var _hasRun = false;
     var _actions = {};
     var _effect = [];
     var _listeners = [];
-    var sagaMiddleware = redux_saga_1.default();
+    var sagaMiddleware = createSagaMiddleware();
     var app = {
         get store() {
             return _store;
@@ -105,7 +103,6 @@ exports.default = (function (_a) {
     return app;
     function run() {
         _hasRun = true;
-        // 1.
         var store = create({
             appReducer: __assign(__assign({}, createReducers()), appReducer),
             middlewares: __spreadArrays(middlewares, [sagaMiddleware]),
@@ -118,7 +115,6 @@ exports.default = (function (_a) {
             });
         });
         app.store = store;
-        // 2.
         sagaMiddleware.run(createEffects());
         return app;
     }
@@ -132,7 +128,6 @@ exports.default = (function (_a) {
         var reducer = model.reducer;
         var initState = model.state;
         var namespace = model.namespace;
-        // 创建 redux reducer
         var reducerFunMap = Object.keys(reducer).reduce(function (a, b) {
             var _a;
             if (typeof _actions[namespace] === "undefined") {
@@ -162,7 +157,6 @@ exports.default = (function (_a) {
                 error: error
             };
         }
-        //重写toString
         actionCreator._toString = actionCreator.toString;
         actionCreator.toString = function () {
             return type;
@@ -183,15 +177,15 @@ exports.default = (function (_a) {
                     switch (_a.label) {
                         case 0:
                             _a.trys.push([0, 2, , 3]);
-                            return [4 /*yield*/, effects_1.fork(saga)];
+                            return [4, fork(saga)];
                         case 1:
                             _a.sent();
-                            return [3 /*break*/, 3];
+                            return [3, 3];
                         case 2:
                             error_1 = _a.sent();
                             console.log(error_1);
-                            return [3 /*break*/, 3];
-                        case 3: return [2 /*return*/];
+                            return [3, 3];
+                        case 3: return [2];
                     }
                 });
             };
@@ -199,10 +193,10 @@ exports.default = (function (_a) {
         return function rootSaga() {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, effects_1.all(_effect.map(errorWrapper).map(effects_1.fork))];
+                    case 0: return [4, all(_effect.map(errorWrapper).map(fork))];
                     case 1:
                         _a.sent();
-                        return [2 /*return*/];
+                        return [2];
                 }
             });
         };
@@ -210,13 +204,10 @@ exports.default = (function (_a) {
     function create(_a) {
         var _b = _a.middlewares, middlewares = _b === void 0 ? [] : _b, appReducer = _a.appReducer, silence = _a.silence;
         if (process.env.NODE_ENV === "development" && !silence) {
-            middlewares.push(redux_logger_1.logger);
+            middlewares.push(logger);
         }
-        // const store = createStore(
-        //   combineReducers(appReducer),
-        //   composeEnhancers(applyMiddleware(...middlewares))
-        // );
-        return redux_1.createStore(redux_1.combineReducers(appReducer), composeEnhancers(redux_1.applyMiddleware.apply(void 0, middlewares)));
+        return createStore(combineReducers(appReducer), composeEnhancers(applyMiddleware.apply(void 0, middlewares)));
         ;
     }
 });
+//# sourceMappingURL=mpa.js.map
