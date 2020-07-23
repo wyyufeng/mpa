@@ -1,4 +1,4 @@
-import { Store, Reducer } from "redux";
+import { Store, Reducer, Dispatch } from "redux";
 export { Reducer } from 'redux';
 export type mpaOptions = {
   appReducer?: {
@@ -42,8 +42,6 @@ export interface App {
   _models: Array<Model>;
   useModel: UseModal
   run: () => App;
-  // useListener: (state: any) => number;
+  dispatch: Dispatch
 
-  // unuseListener: (index: number) => void;
-  // injectEffect: (effect: Saga) => App;
 }
