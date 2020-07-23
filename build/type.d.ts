@@ -1,4 +1,4 @@
-import { Store, Reducer } from "redux";
+import { Store, Reducer, Dispatch } from "redux";
 export { Reducer } from 'redux';
 export declare type mpaOptions = {
     appReducer?: {
@@ -36,4 +36,5 @@ export interface App {
     _models: Array<Model>;
     useModel: UseModal;
     run: () => App;
+    dispatch: Dispatch;
 }
